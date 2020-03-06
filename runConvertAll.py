@@ -4,6 +4,14 @@ import re
 import json
 from argparse import ArgumentParser
 
+def getNevents(infile):
+    searchfile = open(infile, "r")
+    for line in searchfile:
+        if "#  Number of Events        :" in line: 
+            nevents = line.split()[-1]
+    searchfile.close()
+    return nevents
+
 def getFiles(directory):
     """Get files in directory as list recursively."""
         # os.listdir only for locally downloaded files
@@ -26,7 +34,7 @@ def getArgs():
     parser.add_argument(
         '-o', '--outstdhep', default='out.stdhep', help="Name of the output STDHEP file.")
     parser.add_argument(
-        '-ct','--ctau', default='10', help="Value used to displace dark rho.")
+        '-ct','--ctau', default='1', help="Value used to displace dark rho (in mm).")
     return parser
 
 def main():
@@ -44,13 +52,15 @@ def main():
 
         print("Input lhe file: %s" %_lhe_file)
         os.system('mv '+ _lhe_file + ' in.lhe')
+        nevents = getNevents("in.lhe")
+        print("number of events: %s" %nevents)
         out_stdhep='%s.%s'%(_lhe_file.split('.')[0],'stdhep')
         
         fin  = open("hadwrt_template.f", "rt")
         fout = open("hadwrt_test.f", "wt")
 
-        checkWords = ("XXX_INFILE_XXX","XXX_OUTFILE_XXX", "XXX_CTAU_XXX")    
-        repWords = ('in.lhe','out.stdhep',args.ctau)
+        checkWords = ("XXX_NEVENTS_XXX","XXX_INFILE_XXX","XXX_OUTFILE_XXX", "XXX_CTAU_XXX")    
+        repWords = (nevents,'in.lhe','out.stdhep',args.ctau)
 
         for line in fin:
             for check, rep in zip(checkWords, repWords):

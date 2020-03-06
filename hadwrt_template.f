@@ -28,7 +28,7 @@ c
 
       character*7 tag, event/'<event>'/
 
-      ntries = 50000
+      ntries = XXX_NEVENTS_XXX
 
       nevhep = 0
 
